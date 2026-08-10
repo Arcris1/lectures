@@ -22,9 +22,9 @@ echo "-- verify --"
 sleep 3
 docker compose ps --format '  {{.Name}}  {{.Status}}'
 
-# Check the container itself. NOT http://localhost/healthz from the host --
+# Check the container itself. NOT http://127.0.0.1/healthz from the host --
 # that reaches Caddy on :80 and 308-redirects, never touching nginx.
-docker exec lectures-web-1 wget -qO- --timeout=5 http://localhost/healthz \
+docker exec lectures-web-1 wget -qO- --timeout=5 http://127.0.0.1/healthz \
   | sed 's/^/  container: /'
 
 # `up -d` recreates the container, which changes its IP. Caddy re-resolves
