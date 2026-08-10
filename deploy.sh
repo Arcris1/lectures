@@ -22,8 +22,10 @@ echo "-- verify --"
 sleep 3
 docker compose ps --format '  {{.Name}}  {{.Status}}'
 
-# Check the container itself. NOT http://127.0.0.1/healthz from the host --
-# that reaches Caddy on :80 and 308-redirects, never touching nginx.
+# Check the container itself, from inside it. Running this from the HOST
+# would reach Caddy on :80 and 308-redirect, never touching nginx. Use
+# 127.0.0.1 rather than localhost: inside the container localhost resolves
+# to ::1 first, and nginx's `listen 80` binds IPv4 only.
 docker exec lectures-web-1 wget -qO- --timeout=5 http://127.0.0.1/healthz \
   | sed 's/^/  container: /'
 
