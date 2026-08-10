@@ -2,7 +2,7 @@
 
 Long-form technical documentation, rendered as a single self-contained web page.
 
-**Live:** https://docs.ruinedfriendships.online — also at https://docs.72.62.78.114.sslip.io
+**Live:** https://lineaix.com
 
 ## What's here
 
