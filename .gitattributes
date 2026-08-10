@@ -1,0 +1,4 @@
+# Keep LF in scripts so they run on Linux regardless of checkout platform
+*.mjs text eol=lf
+*.sh  text eol=lf
+*.md  text
