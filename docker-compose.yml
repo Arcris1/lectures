@@ -1,0 +1,54 @@
+# Static docs site.
+#
+# The built index.html is served by a tiny nginx container. TLS is terminated
+# by the shared Caddy that fronts every app on this host, which reaches this
+# container BY NAME over the external edge network — so this stack publishes
+# no host ports of its own.
+#
+#   ./deploy.sh          build + (re)start
+#
+# Note: the shared edge network is named `labada-edge` for historical reasons
+# (it was created for the first app that needed it). It is the general-purpose
+# Caddy ingress network, not Labada-specific.
+
+name: lectures
+
+services:
+  web:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+    # No `ports:` — deliberately. Nothing here should be reachable except
+    # through Caddy. See the hardening notes on ufw not covering Docker.
+    networks: [default, labada-edge]
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE, DAC_OVERRIDE]
+
+    deploy:
+      resources:
+        limits:
+          memory: 64m
+          cpus: '0.25'
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "3" }
+
+networks:
+  default:
+  labada-edge:
+    external: true
